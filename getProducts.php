@@ -3,11 +3,11 @@
 
 
 
-
-
+$p=$_GET['p'];
+echo($p);
   $ch = curl_init();
 // CURLOPT_URL, CURLOPT_RETURNTRANSFER, CURLOPT_POST, CURLOPT_POSTFIELDS
-curl_setopt($ch, CURLOPT_URL, "http://www.asahi-archery.co.jp/kyudo_en_jp/k_1/items_en2.php");
+curl_setopt($ch, CURLOPT_URL, "http://www.asahi-archery.co.jp/kyudo_en_jp/${p}/items_en2.php");
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_POST, true);
 //curl_setopt($ch, CURLOPT_POSTFIELDS, "city=".$decodedPar['mias']);
@@ -25,6 +25,13 @@ $doc->loadHTML($result);
 $xml = simplexml_import_dom($doc);
 $r=$xml->xpath('//div[@class="cell_block"]');
 foreach ($r as $key => $value) {
+    //$value=$value->asXML();
+    $item_num=$value->xpath('//span[@class="item_numb"]');
+
+
+    
+    //$button->addAttribute('onclick',"addToCart.php/?id=".$item_num[0]);
+    $value->addChild("button","kup")->addAttribute('onclick',"addToCart.php/?id=".$item_num[0]);
     echo($value->asXML());
 }
 /*
