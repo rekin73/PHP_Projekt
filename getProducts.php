@@ -1,13 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Main</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="send.js"></script>
+</head>
+<body>
+<span class="loggedAs">
+    <?php session_start(); if(isset($_SESSION['username'])) echo "Jesteś zalogowany jako: ".$_SESSION['username']; ?>
+</span>
+<a href='getProducts.php?p=k_1'>Łuki</a>
+    <a href="getProducts.php?p=k_2">Strzały</a>
+    <a href="getProducts.php?p=k_3">Cięciwy</a>
+    <a href="getProducts.php?p=k_4">Rękawice</a>
+    <a href="getProducts.php?p=k_5">Odzierz</a>
+    <div id="content">
 <?php
-
-
-
+spl_autoload_register(function ($class_name) {
+    include $class_name . '.php';
+});
+/* $a=new _Produkt("qwerty",'adasd',1234);
+echo $a->kod;
+$b=new _Bow("asdf",10000,'sdasd',2000);
+$b->setBuyingPrice(21);
+echo $b->buyingPrice; */
 
 $p=$_GET['p'];
-echo($p);
-  $ch = curl_init();
+//echo($p);
+$ch = curl_init();
 // CURLOPT_URL, CURLOPT_RETURNTRANSFER, CURLOPT_POST, CURLOPT_POSTFIELDS
-curl_setopt($ch, CURLOPT_URL, "http://www.asahi-archery.co.jp/kyudo_en_jp/${p}/items_en2.php");
+curl_setopt($ch, CURLOPT_URL, "http://www.asahi-archery.co.jp/kyudo_en_jp/${p}/items_en1.php");
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_POST, true);
 //curl_setopt($ch, CURLOPT_POSTFIELDS, "city=".$decodedPar['mias']);
@@ -19,90 +45,49 @@ curl_close($ch);
 //echo $result;
 //$xml = simplexml_import_dom($result);
 
-
+//print_r($result);
 $doc=new DOMDocument();
 $doc->loadHTML($result);
 $xml = simplexml_import_dom($doc);
 $r=$xml->xpath('//div[@class="cell_block"]');
 foreach ($r as $key => $value) {
     //$value=$value->asXML();
-    $item_num=$value->xpath('//span[@class="item_numb"]');
-
+    $item_num=trim($value->xpath('//span[@class="item_numb"]')[0]);
+    $item_price=trim($value->xpath('//span[@class="item_price"]')[0]);
+    $item_sub=$value->xpath('//span[@class="item_subjects"]');
+//$cena=$value->xpath('//[@href="./profile_en.php?id=*"]');
+//$value->asXML()->div->a->img->addAttribute('src',"http://www.asahi-archery.co.jp/kyudo_en_jp/obj_k");
+//echo($elema->asXML());
 
     
     //$button->addAttribute('onclick',"addToCart.php/?id=".$item_num[0]);
-    $value->addChild("button","kup")->addAttribute('onclick',"addToCart.php/?id=".$item_num[0]);
-    echo($value->asXML());
-}
-/*
-foreach (json_decode($result,true) as $key => $value) {
-    //$value["Miasto"]==$decodedPar['mias'] and $value["Powiat"]==$decodedPar['pow'] and $value["Gmina"]==$decodedPar['gmi'] and $value["Wojewodztwo"]==$decodedPar['woj']
-    if(mb_strtolower($value["Miasto"])==mb_strtolower($decodedPar['mias'])&& mb_strtolower($value["Wojewodztwo"])==mb_strtolower($decodedPar['woj'])&&$value["Powiat"]==$decodedPar['pow'] && $value["Gmina"]==$decodedPar['gmi'])
-    $IdMiasta=$value['IdMiasta'];
-    //print_r(ucfirst(strtolower($value["Miasto"])));
     
-  //echo json_encode($value);  
-}
-*/
-//echo json_encode($decodedId,JSON_UNESCAPED_UNICODE); 
-//echo(json_encode(json_decode($result)[1],JSON_UNESCAPED_UNICODE));
-
-
-
-
-
-
-
-//print_r($decoded['IdMiasta']);
-/*
-$ch = curl_init();
-curl_setopt ($ch, CURLOPT_URL, "http://pocztowekody.pl/index/index/id_city/114933/city/Krzeszowice;Krzeszowice;krakowski;Ma%C5%82opolskie/page/1");
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-$result = curl_exec ($ch);
-curl_close ($ch);
-//print_r($result);
-*/
-
-//$IdMiasta="1801";//Kraków
-/*
-$doc = new DOMDocument();
-@$doc->loadHTMLFile("http://pocztowekody.pl/index/index/id_city/".$IdMiasta."/city/a/page/");
-$xml = simplexml_import_dom($doc);
-$result = $xml->xpath('//span[@class="lblPaging"]');
-$pages=substr((string)$result[0],4,strlen((string)$result[0])); //strony
-
-//echo('\n'.$pages);
-echo'<table>';
-
-for ($j=1; $j <= $pages; $j++) { 
-    @$doc->loadHTMLFile("http://pocztowekody.pl/index/index/id_city/".$IdMiasta."/city/a/page/".$j);
-    $element1=$doc->getElementsByTagName('table');
-    $element=$element1->item(0)->getElementsByTagName('tr');
-    //print_r($element);
-    $k=0;
-foreach ($element as $td) {
-    //echo '<td>'.$td->nodeValue.'</td>', PHP_EOL;
-    echo'<tr>';
-    $params2 = $element->item($k)->getElementsByTagName('td');
-    $i=0;
-    foreach ($params2 as $p) {
-        echo"<td>".$params2->item($i)->nodeValue."</td>"; //get Category attributes
-        $i++;
-    }
-    $k++;
-    echo'</tr>';
-}
-}
-
-echo'</table>';
-
-*/
-
-
-
-/*
-for ($i=1; $i < $pages+1; $i++) { 
+    $price=trim(explode(" ",$item_sub[0])[2]);
+    $item_price=str_replace(",",".",$item_price);
+    $item_name=$value->xpath('//span[@class="item_name"]');
+    $item_name=$item_name[0];
+    //echo $price;
+    //echo ($price);
+    $value->addChild("button","kup")->addAttribute('onclick',"sendReq({id:\"{$item_num}\",price:\"{$item_price}\",addPrice:\"{$price}\",\"name\":\"{$item_name}\"})");
+    //print_r($value);
     
+        //echo("{$key},{$val}");
+        if(preg_match('/YUMI*/',$value->span[0])){
+        //print_r($value->div->a['href'][0]);
+        //echo $value->div->a['href'];
+        }
+        else{}
+        //echo($value->span[0]."<br/>");
+
+    
+    //echo($value);
+    //print_r($value->div->span);
+    
+    echo simplexml_import_dom($value)->asXML();
+    //echo($value->asXML());
 }
-*/
+
 ?>
+</div>
+</body>
+</html>
