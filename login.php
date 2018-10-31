@@ -27,7 +27,8 @@
             if(!isset($_SESSION['username'])){
             if (isset($_POST['login']) && !empty($_POST['username']) 
                && !empty($_POST['password'])) {
-                $conn = new mysqli("localhost", 'root', '', "projektphp");
+                //$conn = new mysqli("localhost", 'root', '', "projektphp");
+                $conn = new mysqli("localhost", 'hkalinowski', 'hkalinowski', "hkalinowski");
                 if ($conn->connect_error) {
                     die("Connection failed: " . $conn->connect_error);
                 } 
