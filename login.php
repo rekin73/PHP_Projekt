@@ -28,7 +28,13 @@
             if (isset($_POST['login']) && !empty($_POST['username']) 
                && !empty($_POST['password'])) {
                 //$conn = new mysqli("localhost", 'root', '', "projektphp");
-                $conn = new mysqli("localhost", 'hkalinowski', 'hkalinowski', "hkalinowski");
+                try{
+                //$conn = new mysqli("localhost", 'hkalinowski', 'hkalinowski', "hkalinowski");
+                $conn = new mysqli("localhost", 'root', '', "hkalinowski");
+                }
+                catch(exeption $e){
+                    $conn = new mysqli("localhost", 'root', '', "hkalinowski");
+                }
                 if ($conn->connect_error) {
                     die("Connection failed: " . $conn->connect_error);
                 } 
@@ -40,6 +46,7 @@
                     $_SESSION['valid'] = true;
                   $_SESSION['timeout'] = time();
                   $_SESSION['username'] = $row['username'];
+                  $_SESSION["data"]=[];
                   echo 'You have entered valid use name and password';
                     }
                  else {

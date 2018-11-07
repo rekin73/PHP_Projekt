@@ -13,12 +13,14 @@
 <span class="loggedAs">
     <?php session_start(); if(isset($_SESSION['username'])) echo "Jesteś zalogowany jako: ".$_SESSION['username']; ?>
 </span>
+<div id="cartUI"><div id="cart"></div><button onclick="sendReq({'action':'clearCart'})">Usuń wszystko</button></div>
 <a href='getProducts.php?p=k_1'>Łuki</a>
     <a href="getProducts.php?p=k_2">Strzały</a>
     <a href="getProducts.php?p=k_3">Cięciwy</a>
     <a href="getProducts.php?p=k_4">Rękawice</a>
     <a href="getProducts.php?p=k_5">Odzierz</a>
     <div id="content">
+    
 <?php
 spl_autoload_register(function ($class_name) {
     include $class_name . '.php';
@@ -52,25 +54,32 @@ $xml = simplexml_import_dom($doc);
 $r=$xml->xpath('//div[@class="cell_block"]');
 foreach ($r as $key => $value) {
     //$value=$value->asXML();
-    $item_num=trim($value->xpath('//span[@class="item_numb"]')[0]);
-    $item_price=trim($value->xpath('//span[@class="item_price"]')[0]);
-    $item_sub=$value->xpath('//span[@class="item_subjects"]');
+    $item_num=trim($value->xpath('//span[@class="item_numb"]')[$key]);
+    $item_price=trim($value->xpath('//span[@class="item_price"]')[$key]);
+    $item_sub=$value->xpath('//span[@class="item_subjects"]')[$key];
 //$cena=$value->xpath('//[@href="./profile_en.php?id=*"]');
 //$value->asXML()->div->a->img->addAttribute('src',"http://www.asahi-archery.co.jp/kyudo_en_jp/obj_k");
 //echo($elema->asXML());
 
     
     //$button->addAttribute('onclick',"addToCart.php/?id=".$item_num[0]);
-    
-    $price=trim(explode(" ",$item_sub[0])[2]);
+    $price = preg_replace('/\s+/', '', $item_sub);
+    $price=substr($price,strpos($price,"¥")+2,4);
+    //$price=trim(explode(" ",$item_sub[0])[2]);
     $item_price=str_replace(",",".",$item_price);
     $item_name=$value->xpath('//span[@class="item_name"]');
-    $item_name=$item_name[0];
+    $item_name=$item_name[$key];
     //echo $price;
     //echo ($price);
-    $value->addChild("button","kup")->addAttribute('onclick',"sendReq({id:\"{$item_num}\",price:\"{$item_price}\",addPrice:\"{$price}\",\"name\":\"{$item_name}\"})");
+    if(preg_match('/YMI*/',$item_num))
+    $value->addChild("button","kup")->addAttribute('onclick',"sendReq({\"action\":\"addToCart\",\"id\":\"{$item_num}\",\"price\":\"{$item_price}\",\"addPrice\":\"{$price}\",name:\"{$item_name}\"})");
+    else
+    $value->addChild("button","kup")->addAttribute('onclick',"sendReq({\"action\":\"addToCart\",\"id\":\"{$item_num}\",\"price\":\"{$item_price}\",name:\"{$item_name}\"})");
     //print_r($value);
-    
+    $baseSource="http://www.asahi-archery.co.jp/kyudo_en_jp/";
+    $pattern='/\.\./';
+    $string=$value->div->a->img->attributes()->src;
+    $value->div->a->img->attributes()->src= preg_replace($pattern,$baseSource,$string);
         //echo("{$key},{$val}");
         if(preg_match('/YUMI*/',$value->span[0])){
         //print_r($value->div->a['href'][0]);

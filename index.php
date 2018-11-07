@@ -18,7 +18,7 @@
     <a href="getProducts.php?p=k_3">Cięciwy</a>
     <a href="getProducts.php?p=k_4">Rękawice</a>
     <a href="getProducts.php?p=k_5">Odzierz</a>
-
+    <a href="login.php">Panel Logowania</a>
 </body>
 
 </html>
